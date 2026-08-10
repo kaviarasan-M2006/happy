@@ -1,0 +1,217 @@
+/* Modern Premium Theme Styling System */
+
+/* Theme Definitions mapping CSS variables */
+
+/* 1. Fantasy Universe */
+.theme-fantasy-universe {
+  --theme-bg: linear-gradient(135deg, #120024 0%, #2e004f 50%, #4a0e68 100%);
+  --theme-text: #f0e6ff;
+  --theme-accent: #d9a5ff;
+  --theme-accent-glow: rgba(217, 165, 255, 0.5);
+  --theme-glass-bg: rgba(26, 0, 48, 0.45);
+  --theme-glass-border: rgba(217, 165, 255, 0.15);
+  --theme-font: 'Outfit', 'Georgia', serif;
+  --theme-border-radius: 20px;
+  background-attachment: fixed;
+}
+
+/* 2. Galaxy */
+.theme-galaxy {
+  --theme-bg: radial-gradient(circle at center, #020208 0%, #080816 60%, #000000 100%);
+  --theme-text: #e2e8f0;
+  --theme-accent: #00f0ff;
+  --theme-accent-glow: rgba(0, 240, 255, 0.5);
+  --theme-glass-bg: rgba(5, 5, 20, 0.6);
+  --theme-glass-border: rgba(0, 240, 255, 0.2);
+  --theme-font: 'Courier New', monospace;
+  --theme-border-radius: 12px;
+  background-attachment: fixed;
+}
+
+/* 3. Princess */
+.theme-princess {
+  --theme-bg: linear-gradient(135deg, #fff0f5 0%, #ffe4e1 50%, #ffb6c1 100%);
+  --theme-text: #5c2c3a;
+  --theme-accent: #ff69b4;
+  --theme-accent-glow: rgba(255, 105, 180, 0.4);
+  --theme-glass-bg: rgba(255, 255, 255, 0.7);
+  --theme-glass-border: rgba(255, 105, 180, 0.25);
+  --theme-font: 'Playfair Display', 'Didot', serif;
+  --theme-border-radius: 30px;
+}
+
+/* 4. Royal Gold */
+.theme-royal-gold {
+  --theme-bg: linear-gradient(135deg, #0f0f12 0%, #1a1a24 50%, #0a0a0d 100%);
+  --theme-text: #f3e5ab;
+  --theme-accent: #d4af37;
+  --theme-accent-glow: rgba(212, 175, 55, 0.6);
+  --theme-glass-bg: rgba(18, 18, 24, 0.8);
+  --theme-glass-border: rgba(212, 175, 55, 0.3);
+  --theme-font: 'Cinzel', 'Times New Roman', serif;
+  --theme-border-radius: 8px;
+  background-attachment: fixed;
+}
+
+/* 5. Nature */
+.theme-nature {
+  --theme-bg: linear-gradient(135deg, #0c2012 0%, #153a21 50%, #205c33 100%);
+  --theme-text: #e8f5e9;
+  --theme-accent: #81c784;
+  --theme-accent-glow: rgba(129, 199, 132, 0.5);
+  --theme-glass-bg: rgba(12, 32, 18, 0.5);
+  --theme-glass-border: rgba(129, 199, 132, 0.2);
+  --theme-font: 'Outfit', sans-serif;
+  --theme-border-radius: 24px;
+  background-attachment: fixed;
+}
+
+/* 6. Neon */
+.theme-neon {
+  --theme-bg: #050508;
+  --theme-text: #ffffff;
+  --theme-accent: #ff007f;
+  --theme-accent-glow: rgba(255, 0, 127, 0.6);
+  --theme-glass-bg: rgba(10, 10, 15, 0.8);
+  --theme-glass-border: rgba(255, 0, 127, 0.4);
+  --theme-font: 'Outfit', sans-serif;
+  --theme-border-radius: 4px;
+  box-shadow: 0 0 15px rgba(255, 0, 127, 0.1) inset;
+}
+
+/* 7. Love */
+.theme-love {
+  --theme-bg: linear-gradient(135deg, #3a0007 0%, #6b0010 50%, #a3001c 100%);
+  --theme-text: #ffeef0;
+  --theme-accent: #ff4d6d;
+  --theme-accent-glow: rgba(255, 77, 109, 0.6);
+  --theme-glass-bg: rgba(58, 0, 7, 0.65);
+  --theme-glass-border: rgba(255, 77, 109, 0.3);
+  --theme-font: 'Outfit', 'Caveat', cursive, sans-serif;
+  --theme-border-radius: 25px;
+  background-attachment: fixed;
+}
+
+/* 8. Minimal Elegant */
+.theme-minimal-elegant {
+  --theme-bg: #fafafa;
+  --theme-text: #1a1a1a;
+  --theme-accent: #111111;
+  --theme-accent-glow: rgba(0, 0, 0, 0.1);
+  --theme-glass-bg: rgba(255, 255, 255, 0.9);
+  --theme-glass-border: rgba(0, 0, 0, 0.08);
+  --theme-font: 'Inter', sans-serif;
+  --theme-border-radius: 12px;
+  border: 1px solid #eaeaea;
+}
+
+/* 9. Anime */
+.theme-anime {
+  --theme-bg: linear-gradient(135deg, #ff7e5f 0%, #feb47b 100%);
+  --theme-text: #2c3e50;
+  --theme-accent: #3498db;
+  --theme-accent-glow: rgba(52, 152, 219, 0.5);
+  --theme-glass-bg: rgba(255, 255, 255, 0.85);
+  --theme-glass-border: #2c3e50;
+  --theme-font: 'Comic Sans MS', 'Outfit', sans-serif;
+  --theme-border-radius: 16px;
+  border: 3px solid #2c3e50;
+}
+
+/* 10. Custom */
+.theme-custom {
+  --theme-bg: var(--custom-bg, linear-gradient(135deg, #1f4068 0%, #162447 100%));
+  --theme-text: var(--custom-text, #ffffff);
+  --theme-accent: var(--custom-accent, #ff007f);
+  --theme-accent-glow: var(--custom-accent-glow, rgba(255, 0, 127, 0.4));
+  --theme-glass-bg: rgba(255, 255, 255, 0.05);
+  --theme-glass-border: rgba(255, 255, 255, 0.1);
+  --theme-font: 'Outfit', sans-serif;
+  --theme-border-radius: 16px;
+}
+
+/* Base Theme Styling overrides */
+.universe-container {
+  min-height: 100vh;
+  background: var(--theme-bg);
+  color: var(--theme-text);
+  font-family: var(--theme-font);
+  transition: background 0.8s ease, color 0.5s ease;
+  overflow-x: hidden;
+}
+
+/* Glassmorphism Panels */
+.glass-panel {
+  background: var(--theme-glass-bg);
+  backdrop-filter: blur(15px) saturate(160%);
+  -webkit-backdrop-filter: blur(15px) saturate(160%);
+  border: 1px solid var(--theme-glass-border);
+  border-radius: var(--theme-border-radius);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.25);
+  transition: border 0.3s ease, background 0.3s ease, transform 0.3s ease;
+}
+
+.glass-panel:hover {
+  border-color: var(--theme-accent);
+  box-shadow: 0 10px 40px 0 rgba(0, 0, 0, 0.35);
+}
+
+/* Glowing Typography */
+.glow-text {
+  text-shadow: 0 0 10px var(--theme-accent-glow), 0 0 20px var(--theme-accent-glow);
+}
+
+/* Glowing Buttons */
+.btn-glow {
+  background: linear-gradient(135deg, var(--theme-accent) 0%, rgba(255,255,255,0.1) 100%);
+  border: 1px solid var(--theme-glass-border);
+  color: var(--theme-text);
+  box-shadow: 0 4px 15px var(--theme-accent-glow);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border-radius: var(--theme-border-radius);
+}
+
+.btn-glow:hover {
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 6px 25px var(--theme-accent);
+  border-color: var(--theme-text);
+}
+
+.btn-glow:active {
+  transform: translateY(1px);
+}
+
+/* Theme-specific cursors (optional) */
+.custom-cursor-fantasy-universe { cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23d9a5ff' stroke-width='2'%3E%3Cpath d='M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z'/%3E%3C/svg%3E") 12 12, auto; }
+.custom-cursor-galaxy { cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%2300f0ff' stroke-width='2'%3E%3Ccircle cx='12' cy='12' r='10'/%3E%3Cpath d='M12 2v20M2 12h20'/%3E%3C/svg%3E") 12 12, auto; }
+.custom-cursor-love { cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='%23ff4d6d' stroke='%233a0007' stroke-width='1.5'%3E%3Cpath d='M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z'/%3E%3C/svg%3E") 12 12, auto; }
+
+/* Custom Animations */
+@keyframes float {
+  0% { transform: translateY(0px) rotate(0deg); }
+  50% { transform: translateY(-15px) rotate(3deg); }
+  100% { transform: translateY(0px) rotate(0deg); }
+}
+
+@keyframes spin-slow {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes pulse-glow {
+  0% { text-shadow: 0 0 8px var(--theme-accent-glow); opacity: 0.8; }
+  50% { text-shadow: 0 0 20px var(--theme-accent); opacity: 1; }
+  100% { text-shadow: 0 0 8px var(--theme-accent-glow); opacity: 0.8; }
+}
+
+.floating-element {
+  animation: float 6s ease-in-out infinite;
+}
+
+.spinning-element {
+  animation: spin-slow 20s linear infinite;
+}
+
+.pulsing-glow {
+  animation: pulse-glow 3s ease-in-out infinite;
+}

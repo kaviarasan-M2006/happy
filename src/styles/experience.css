@@ -1,0 +1,394 @@
+/* Birthday Experience Public Pages Styling */
+
+.experience-viewport {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Page Transitions */
+.page-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 1s cubic-bezier(0.4, 0, 0.2, 1), visibility 1.1s;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+  z-index: 10;
+}
+
+.page-container.active {
+  opacity: 1;
+  visibility: visible;
+  z-index: 20;
+}
+
+/* Page 1: Magical Entrance */
+.entrance-portal {
+  width: 180px;
+  height: 180px;
+  border-radius: 50%;
+  background: radial-gradient(circle, var(--theme-accent) 0%, transparent 70%);
+  border: 2px solid var(--theme-text);
+  box-shadow: 0 0 30px var(--theme-accent-glow), inset 0 0 20px var(--theme-accent);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  margin: 30px 0;
+  animation: portal-pulse 4s ease-in-out infinite, spin-slow 25s linear infinite;
+  transition: all 0.5s ease;
+}
+
+.entrance-portal:hover {
+  transform: scale(1.08);
+  box-shadow: 0 0 50px var(--theme-accent), inset 0 0 30px var(--theme-accent);
+}
+
+@keyframes portal-pulse {
+  0% { transform: scale(1); opacity: 0.8; }
+  50% { transform: scale(1.05); opacity: 1; }
+  100% { transform: scale(1); opacity: 0.8; }
+}
+
+.entrance-title {
+  font-size: 2.2rem;
+  font-weight: 800;
+  margin-bottom: 15px;
+  text-align: center;
+}
+
+.entrance-subtitle {
+  font-size: 1.1rem;
+  max-width: 500px;
+  text-align: center;
+  opacity: 0.8;
+  margin-bottom: 40px;
+}
+
+/* Page 2: Memory World (Slideshow / polaroids) */
+.memory-viewer {
+  width: 100%;
+  max-width: 500px;
+  perspective: 1000px;
+}
+
+.polaroid-card {
+  background: white;
+  padding: 16px 16px 40px 16px;
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
+  border-radius: 4px;
+  transform: rotate(-2deg);
+  transition: transform 0.5s ease, opacity 0.5s ease;
+  width: 100%;
+}
+
+.theme-minimal-elegant .polaroid-card {
+  background: var(--theme-glass-bg);
+  border: 1px solid var(--theme-glass-border);
+  padding: 12px;
+  border-radius: 12px;
+}
+
+.polaroid-img-container {
+  width: 100%;
+  height: 320px;
+  overflow: hidden;
+  background: #000;
+  border: 1px solid #eee;
+}
+
+.polaroid-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.polaroid-caption {
+  font-family: var(--theme-font);
+  color: #333;
+  margin-top: 15px;
+  font-size: 1.1rem;
+  text-align: center;
+  font-weight: 600;
+}
+
+.theme-minimal-elegant .polaroid-caption {
+  color: var(--theme-text);
+}
+
+.polaroid-meta {
+  color: #666;
+  font-size: 0.8rem;
+  text-align: center;
+  margin-top: 5px;
+}
+
+.theme-minimal-elegant .polaroid-meta {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.memory-controls {
+  display: flex;
+  gap: 20px;
+  margin-top: 30px;
+  align-items: center;
+}
+
+.nav-btn {
+  background: var(--theme-glass-bg);
+  border: 1px solid var(--theme-glass-border);
+  color: var(--theme-text);
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s;
+}
+
+.nav-btn:hover {
+  background: var(--theme-accent);
+  color: #fff;
+  transform: scale(1.1);
+}
+
+/* Page 3: Cake Celebration */
+.cake-wrapper {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 30px 0;
+}
+
+/* 3D-like CSS Cake */
+.cake {
+  position: relative;
+  width: 200px;
+  height: 120px;
+  background: #f4d06f; /* Default cake body color */
+  border-radius: 10px 10px 0 0;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+  display: flex;
+  justify-content: center;
+  border: 3px solid rgba(255, 255, 255, 0.1);
+  background-size: cover;
+}
+
+.cake-tier-2 {
+  position: absolute;
+  top: -40px;
+  width: 140px;
+  height: 50px;
+  background: #ff8b94;
+  border-radius: 8px 8px 0 0;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  border: 2px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Cake designs customization */
+.cake-design-chocolate {
+  background: linear-gradient(180deg, #4e2f18 0%, #2f1d0f 100%) !important;
+}
+.cake-design-rainbow {
+  background: linear-gradient(180deg, #ff007f 0%, #ff8c00 30%, #ffd700 60%, #00ffff 100%) !important;
+}
+.cake-design-elegant {
+  background: linear-gradient(180deg, #faf9f6 0%, #d4af37 100%) !important;
+}
+
+/* Candles */
+.candles-row {
+  position: absolute;
+  top: -75px; /* Above tier 2 */
+  left: 0;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  pointer-events: none;
+  z-index: 30;
+}
+
+.candle-container {
+  position: relative;
+  width: 10px;
+  height: 35px;
+  cursor: pointer;
+  pointer-events: auto;
+}
+
+.candle-wax {
+  width: 100%;
+  height: 100%;
+  border-radius: 2px;
+}
+
+.candle-wick {
+  position: absolute;
+  top: -6px;
+  left: 4px;
+  width: 2px;
+  height: 6px;
+  background: #333;
+}
+
+.candle-flame {
+  position: absolute;
+  top: -15px;
+  left: 1px;
+  width: 8px;
+  height: 12px;
+  background: radial-gradient(circle, #ffeb3b 0%, #ff5722 80%);
+  border-radius: 50% 50% 20% 20%;
+  transform-origin: bottom center;
+  animation: flicker 0.15s ease-in-out infinite alternate;
+  box-shadow: 0 0 10px #ff5722;
+}
+
+@keyframes flicker {
+  0% { transform: scale(1) rotate(-1deg); }
+  100% { transform: scale(1.15) rotate(1deg); }
+}
+
+/* Audio Player styling */
+.audio-controller {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 100;
+  background: rgba(0, 0, 0, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 8px 16px;
+  border-radius: 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.85rem;
+}
+
+/* Page 5: Reply Form */
+.reply-card {
+  max-width: 450px;
+  width: 100%;
+  padding: 25px;
+  margin-top: 20px;
+}
+
+.rating-stars {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin: 15px 0;
+}
+
+.star-icon {
+  font-size: 2rem;
+  cursor: pointer;
+  color: rgba(255, 255, 255, 0.2);
+  transition: color 0.2s;
+}
+
+.star-icon.active {
+  color: #ffd700;
+  text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+}
+
+/* Next / Prev Navigation overlay on side borders */
+.side-nav-area {
+  position: absolute;
+  top: 0;
+  height: 100%;
+  width: 10%;
+  min-width: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 50;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.side-nav-area:hover {
+  opacity: 0.7;
+  background: linear-gradient(90deg, rgba(255,255,255,0.03) 0%, transparent 100%);
+}
+
+.side-nav-area.right-nav {
+  right: 0;
+}
+
+.side-nav-area.right-nav:hover {
+  background: linear-gradient(270deg, rgba(255,255,255,0.03) 0%, transparent 100%);
+}
+
+.side-nav-area.left-nav {
+  left: 0;
+}
+
+/* Navigation Indicators */
+.navigation-indicators {
+  position: fixed;
+  bottom: 25px;
+  display: flex;
+  gap: 10px;
+  z-index: 90;
+}
+
+.indicator-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.25);
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.indicator-dot.active {
+  width: 24px;
+  border-radius: 4px;
+  background: var(--theme-accent);
+  box-shadow: 0 0 8px var(--theme-accent);
+}
+
+/* Particle overlays (CSS fallback) */
+.css-particles-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 5;
+}
+
+.floating-balloon {
+  position: absolute;
+  bottom: -100px;
+  width: 40px;
+  height: 50px;
+  border-radius: 50% 50% 50% 50% / 40% 40% 60% 60%;
+  animation: balloon-float 15s linear infinite;
+  opacity: 0.6;
+}
+
+@keyframes balloon-float {
+  0% { transform: translateY(0) translateX(0) rotate(0deg); }
+  50% { transform: translateY(-50vh) translateX(30px) rotate(5deg); }
+  100% { transform: translateY(-110vh) translateX(-30px) rotate(-5deg); }
+}
