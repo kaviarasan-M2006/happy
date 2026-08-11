@@ -16,7 +16,6 @@ import {
   VolumeX,
   ArrowRight,
   ArrowLeft,
-  Share2,
   Copy,
   Video,
   User,
@@ -119,6 +118,38 @@ const buildUniverseShareUrl = (id: string, location: Location = window.location)
   return `${location.origin}${normalizedBase}/universe/${id}`;
 };
 
+const getUniverseData = async (id: string, password?: string): Promise<BirthdayUniverse | { requiresPassword: true } | null> => {
+  try {
+    const localUniverse = await getUniverse(id);
+    if (localUniverse) {
+      return localUniverse;
+    }
+  } catch (err) {
+    console.warn('Failed to read universe from browser storage', err);
+  }
+
+  try {
+    const passwordQuery = password ? `?password=${encodeURIComponent(password)}` : '';
+    const apiRes = await fetch(`/api/universe/${encodeURIComponent(id)}${passwordQuery}`);
+    if (apiRes.status === 403) {
+      return { requiresPassword: true };
+    }
+    if (!apiRes.ok) {
+      return null;
+    }
+
+    const data = await apiRes.json();
+    if (data?.id) {
+      await saveUniverse(data);
+      return data;
+    }
+  } catch (err) {
+    console.warn('Failed to read universe from server API', err);
+  }
+
+  return null;
+};
+
 export default function App() {
   const [, setCurrentHash] = useState(window.location.hash);
   const [currentRouteId, setCurrentRouteId] = useState(() => getUniverseRouteId());
@@ -167,8 +198,10 @@ export default function App() {
   const [contactPhone, setContactPhone] = useState('');
   const [contactMessage, setContactMessage] = useState('Happy Birthday!');
   const [enteredPassword, setEnteredPassword] = useState('');
+  const [submittedPassword, setSubmittedPassword] = useState('');
   const [passwordVerified, setPasswordVerified] = useState(true);
   const [passwordError, setPasswordError] = useState('');
+  const [routeRequiresPassword, setRouteRequiresPassword] = useState(false);
   const [existingUniverses, setExistingUniverses] = useState<BirthdayUniverse[]>([]);
 
   // Quotes assistant state
@@ -201,8 +234,10 @@ export default function App() {
       setCurrentHash(window.location.hash);
       setCurrentRouteId(getUniverseRouteId());
       setEnteredPassword('');
+      setSubmittedPassword('');
       setPasswordVerified(true);
       setPasswordError('');
+      setRouteRequiresPassword(false);
       setExperiencePage(1);
       setCurrentMemoryIdx(0);
       setIsCakeBlown(false);
@@ -235,19 +270,17 @@ export default function App() {
       const routeId = currentRouteId || getUniverseRouteId();
       if (routeId) {
         const id = routeId;
-        let data = await getUniverse(id);
-        if (!data) {
-          try {
-            const apiRes = await fetch(`/api/universe/${id}`);
-            if (apiRes.ok) {
-              data = await apiRes.json();
-            }
-          } catch (err) {
-            console.warn('API sync get failed', err);
-          }
+        const data = await getUniverseData(id, submittedPassword);
+        if (data && 'requiresPassword' in data) {
+          setUniverseData(null);
+          setRouteRequiresPassword(true);
+          setPasswordVerified(false);
+          setLoading(false);
+          return;
         }
         if (data) {
           setUniverseData(data);
+          setRouteRequiresPassword(false);
           setRecipientLanguage(data.language || 'en');
           // Setup candles array
           setCandlesLit(new Array(data.cake.candleCount || 1).fill(true));
@@ -271,6 +304,7 @@ export default function App() {
           }
         } else {
           setUniverseData(null);
+          setRouteRequiresPassword(false);
         }
       } else {
         // Load existing universes for creator list
@@ -280,7 +314,7 @@ export default function App() {
       setLoading(false);
     };
     loadRouteData();
-  }, [currentRouteId]);
+  }, [currentRouteId, submittedPassword]);
 
   // Clean audio on unmount
   useEffect(() => {
@@ -574,21 +608,17 @@ export default function App() {
 
   const handlePasswordSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!universeData) return;
+    if (!currentRouteId) return;
 
-    if (!universeData.accessPassword) {
-      setPasswordVerified(true);
-      setPasswordError('');
+    if (!enteredPassword) {
+      setPasswordVerified(false);
+      setPasswordError('Please enter the password shared with you.');
       return;
     }
 
-    if (enteredPassword === universeData.accessPassword) {
-      setPasswordVerified(true);
-      setPasswordError('');
-    } else {
-      setPasswordVerified(false);
-      setPasswordError('Incorrect password. Please try again.');
-    }
+    setSubmittedPassword(enteredPassword);
+    setPasswordVerified(true);
+    setPasswordError('');
   };
 
   // PUBLIC BIRTHDAY EXPERIENCE VIEW
@@ -608,7 +638,7 @@ export default function App() {
     const { name, nickname, age, message, thankYou, theme, cake: cakeData, generatedVideoUrl: slideVideo } = universeData;
     const currentThemeClass = `theme-${theme || 'fantasy-universe'}`;
 
-    if (universeData.accessPassword && !passwordVerified) {
+    if ((universeData?.accessPassword || routeRequiresPassword) && !passwordVerified) {
       return (
         <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#04030b', color: '#ffffff', padding: '20px' }}>
           <div style={{ width: '100%', maxWidth: '420px', padding: '24px', borderRadius: '16px', border: '1px solid rgba(255,255,255,0.12)', background: 'rgba(255,255,255,0.04)' }}>
@@ -1441,11 +1471,11 @@ export default function App() {
                   </div>
 
                   <div style={{ display: 'flex', gap: '8px' }}>
-                    <a
-                      href={buildUniverseShareUrl(univ.id)}
-                      target="_blank"
-                      rel="noreferrer"
-                      onClick={(e) => e.stopPropagation()}
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleLoadUniverseForEditing(univ);
+                      }}
                       style={{
                         background: 'rgba(255, 0, 127, 0.15)',
                         border: '1px solid rgba(255, 0, 127, 0.3)',
@@ -1453,14 +1483,11 @@ export default function App() {
                         padding: '4px 10px',
                         color: '#ff007f',
                         fontSize: '0.75rem',
-                        textDecoration: 'none',
-                        display: 'inline-flex',
-                        alignItems: 'center',
-                        gap: '4px'
+                        cursor: 'pointer'
                       }}
                     >
-                      <Share2 size={12} /> Open Public Link
-                    </a>
+                      Open draft
+                    </button>
                     <button
                       onClick={(e) => handleDeleteUniverse(univ.id, e)}
                       style={{

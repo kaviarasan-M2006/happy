@@ -8,8 +8,8 @@
     "build": "tsc -b && vite build",
     "lint": "oxlint",
     "preview": "vite preview",
-    "server": "node server.js",
-    "start": "node server.js"
+    "server": "node server-minimal.js",
+    "start": "node server-minimal.js"
   },
   "dependencies": {
     "cors": "^2.8.6",

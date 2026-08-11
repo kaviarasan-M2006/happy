@@ -6,12 +6,10 @@ import { fileURLToPath } from 'url';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-
 const app = express();
 const PORT = process.env.PORT || 3001;
 
 app.use(cors());
-// Set high JSON limit to support large base64 media uploads
 app.use(express.json({ limit: '100mb' }));
 app.use(express.urlencoded({ limit: '100mb', extended: true }));
 
@@ -20,15 +18,8 @@ if (!fs.existsSync(DATA_DIR)) {
   fs.mkdirSync(DATA_DIR, { recursive: true });
 }
 
-// Log requests
-app.use((req, res, next) => {
-  console.log(`[${new Date().toISOString()}] ${req.method} ${req.url}`);
-  next();
-});
-
 const getUniverseFilePath = (id) => path.join(DATA_DIR, `${id}.json`);
 
-// Save birthday universe details
 app.post('/api/universe', (req, res) => {
   const universe = req.body;
   if (!universe || !universe.id) {
@@ -36,48 +27,36 @@ app.post('/api/universe', (req, res) => {
   }
 
   try {
-    const filePath = getUniverseFilePath(universe.id);
-    fs.writeFileSync(filePath, JSON.stringify(universe, null, 2));
-    console.log(`Successfully saved universe: ${universe.id}`);
+    fs.writeFileSync(getUniverseFilePath(universe.id), JSON.stringify(universe, null, 2));
     res.json({ success: true, id: universe.id });
   } catch (error) {
-    console.error('Failed to save universe file:', error);
     res.status(500).json({ error: 'Failed to write data on server.' });
   }
 });
 
-// Fetch birthday universe details
 app.get('/api/universe/:id', (req, res) => {
   const { id } = req.params;
   const filePath = getUniverseFilePath(id);
   const requestedPassword = req.query.password;
 
   if (!fs.existsSync(filePath)) {
-    console.log(`Universe not found: ${id}`);
     return res.status(404).json({ error: 'Universe not found.' });
   }
 
   try {
-    const fileData = fs.readFileSync(filePath, 'utf-8');
-    const universe = JSON.parse(fileData);
-
+    const universe = JSON.parse(fs.readFileSync(filePath, 'utf8'));
     if (universe.accessPassword && requestedPassword !== universe.accessPassword) {
       return res.status(403).json({ error: 'Password required.' });
     }
-
     res.json(universe);
   } catch (error) {
-    console.error('Failed to read universe file:', error);
     res.status(500).json({ error: 'Failed to read data on server.' });
   }
 });
 
-// Serve Vite frontend production build
 const distPath = path.join(__dirname, 'dist');
 const indexFilePath = path.join(distPath, 'index.html');
-if (fs.existsSync(distPath)) {
-  console.log(`Serving static files from production folder: ${distPath}`);
-
+if (fs.existsSync(distPath) && fs.existsSync(indexFilePath)) {
   app.get('/universe/:id', (req, res) => {
     res.type('html').send(fs.readFileSync(indexFilePath, 'utf8'));
   });
@@ -86,23 +65,14 @@ if (fs.existsSync(distPath)) {
     res.type('html').send(fs.readFileSync(indexFilePath, 'utf8'));
   });
 
-  app.use(express.static(distPath));
-
-  // Catch-all route to serve index.html for react routing / hash compatibility
   app.use((req, res, next) => {
     if (req.path.startsWith('/api/')) {
       return next();
     }
     res.type('html').send(fs.readFileSync(indexFilePath, 'utf8'));
   });
-} else {
-  console.log('Production folder "dist" not found. Running in API-only server mode.');
 }
 
 app.listen(PORT, () => {
-  console.log(`==================================================`);
-  console.log(`🎉 Birthday Universe Express Server running!`);
-  console.log(`🔗 URL: http://localhost:${PORT}`);
-  console.log(`💾 Data stored at: ${DATA_DIR}`);
-  console.log(`==================================================`);
+  console.log(`Server listening on ${PORT}`);
 });
