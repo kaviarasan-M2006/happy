@@ -106,9 +106,37 @@ export const ThemeSelector: React.FC<ThemeSelectorProps> = ({
       </div>
 
       <h3 style={{ margin: '32px 0 12px' }}>Celebration Animation</h3>
-      <select className="form-input" value={animationPreset} onChange={(e) => setAnimationPreset(e.target.value)}>
-        {animationPresets.map((preset, index) => <option key={preset} value={`animation-${index + 1}`}>{String(index + 1).padStart(2, '0')} — {preset}</option>)}
-      </select>
+      <p className="selector-help">
+        Click any card to select it. The small preview is a live sample of the animation style.
+      </p>
+
+      <div className="animation-preview-grid" aria-label="Celebration animation choices">
+        {animationPresets.map((preset, index) => {
+          const id = `animation-${index + 1}`;
+          return (
+            <button
+              type="button"
+              key={preset}
+              className={`animation-preview-card ${animationPreset === id ? 'selected' : ''}`}
+              onClick={() => setAnimationPreset(id)}
+              aria-pressed={animationPreset === id}
+            >
+              <div className={`animation-demo animation-demo-${(index % 10) + 1}`}>
+                <span className="demo-shape demo-star">✦</span>
+                <span className="demo-shape demo-balloon">●</span>
+                <span className="demo-shape demo-sparkle">✦</span>
+                <span className="demo-shape demo-dot">•</span>
+              </div>
+              <div className="animation-preview-name">
+                {String(index + 1).padStart(2, '0')} — {preset}
+              </div>
+              <div className="animation-preview-status">
+                {animationPreset === id ? '✓ Selected' : 'Preview & Select'}
+              </div>
+            </button>
+          );
+        })}
+      </div>
 
       <h3 style={{ marginBottom: '20px' }}>Particles & Visual Effects</h3>
       <div className="particles-toggles">

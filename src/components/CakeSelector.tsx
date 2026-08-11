@@ -37,6 +37,44 @@ export const CakeSelector: React.FC<CakeSelectorProps> = ({ cake, setCake, defau
     }
   };
 
+  const selectedPresetIndex = cake.design.match(/^cake-(\d+)$/)?.[1]
+    ? Number(cake.design.match(/^cake-(\d+)$/)?.[1]) - 1
+    : -1;
+
+  const selectedPresetName =
+    selectedPresetIndex >= 0
+      ? cakePresetNames[selectedPresetIndex]
+      : '';
+
+  const presetHue =
+    selectedPresetIndex >= 0
+      ? ((selectedPresetIndex + 1) * 43) % 360
+      : 0;
+
+  const previewTopBackground = selectedPresetIndex >= 0
+    ? `linear-gradient(90deg, hsl(${(presetHue + 12) % 360} 62% 35%), hsl(${(presetHue + 18) % 360} 88% 73%) 45%, hsl(${(presetHue + 30) % 360} 72% 44%))`
+    : cake.design === 'chocolate'
+      ? '#4e2f18'
+      : cake.design === 'strawberry'
+        ? '#ff8b94'
+        : cake.design === 'rainbow'
+          ? 'linear-gradient(90deg, #ff007f, #ff8c00, #ffd700)'
+          : cake.design === 'custom'
+            ? (cake.customTier2Color || '#ff9999')
+            : '#faf9f6';
+
+  const previewBaseBackground = selectedPresetIndex >= 0
+    ? `linear-gradient(90deg, hsl(${presetHue} 58% 28%), hsl(${presetHue} 82% 66%) 24%, hsl(${(presetHue + 18) % 360} 92% 88%) 50%, hsl(${presetHue} 75% 52%) 78%, hsl(${presetHue} 58% 25%))`
+    : cake.design === 'chocolate'
+      ? 'linear-gradient(180deg, #4e2f18 0%, #2f1d0f 100%)'
+      : cake.design === 'strawberry'
+        ? 'linear-gradient(180deg, #ff8b94 0%, #ff5e6c 100%)'
+        : cake.design === 'rainbow'
+          ? 'linear-gradient(90deg, #ff007f, #7f00ff, #00ffff)'
+          : cake.design === 'custom'
+            ? `linear-gradient(180deg, ${cake.customTier2Color || '#ff9999'} 0%, ${cake.customTier1Color || '#ff3333'} 100%)`
+            : 'linear-gradient(180deg, #faf9f6 0%, #d4af37 100%)';
+
   const candleColors = [
     { name: '💖 Hot Pink', value: '#ff3385' },
     { name: '💙 Ocean Blue', value: '#3399ff' },
@@ -182,9 +220,32 @@ export const CakeSelector: React.FC<CakeSelectorProps> = ({ cake, setCake, defau
             overflow: 'hidden'
           }}
         >
-          <div style={{ position: 'absolute', top: '15px', left: '15px', fontSize: '0.8rem', opacity: 0.5, fontWeight: 'bold' }}>
-            PREVIEW
+          <div style={{ position: 'absolute', top: '15px', left: '15px', fontSize: '0.8rem', opacity: 0.55, fontWeight: 'bold', zIndex: 10 }}>
+            LIVE PREVIEW
           </div>
+
+          {selectedPresetName && (
+            <div
+              style={{
+                position: 'absolute',
+                top: '15px',
+                right: '15px',
+                maxWidth: '58%',
+                padding: '5px 9px',
+                borderRadius: '999px',
+                background: 'rgba(0,0,0,.35)',
+                border: '1px solid rgba(255,255,255,.14)',
+                fontSize: '0.72rem',
+                fontWeight: 700,
+                zIndex: 10,
+                whiteSpace: 'nowrap',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis'
+              }}
+            >
+              {selectedPresetName}
+            </div>
+          )}
 
           {/* Render Candles */}
           <div
@@ -198,7 +259,7 @@ export const CakeSelector: React.FC<CakeSelectorProps> = ({ cake, setCake, defau
               flexWrap: 'wrap-reverse'
             }}
           >
-            {Array.from({ length: Math.min(10, cake.candleCount) }).map((_, idx) => (
+            {Array.from({ length: cake.candleCount }).map((_, idx) => (
               <div
                 key={idx}
                 style={{
@@ -241,15 +302,7 @@ export const CakeSelector: React.FC<CakeSelectorProps> = ({ cake, setCake, defau
               borderRadius: '6px 6px 0 0',
               zIndex: 2,
               border: '2px solid rgba(255, 255, 255, 0.1)',
-              background: cake.design === 'chocolate'
-                ? '#4e2f18'
-                : cake.design === 'strawberry'
-                ? '#ff8b94'
-                : cake.design === 'rainbow'
-                ? 'linear-gradient(90deg, #ff007f, #ff8c00, #ffd700)'
-                : cake.design === 'custom'
-                ? (cake.customTier2Color || '#ff9999')
-                : '#faf9f6'
+              background: previewTopBackground
             }}
           />
 
@@ -266,15 +319,7 @@ export const CakeSelector: React.FC<CakeSelectorProps> = ({ cake, setCake, defau
               justifyContent: 'center',
               boxShadow: '0 8px 16px rgba(0,0,0,0.3)',
               border: '2px solid rgba(255, 255, 255, 0.1)',
-              background: cake.design === 'chocolate'
-                ? 'linear-gradient(180deg, #4e2f18 0%, #2f1d0f 100%)'
-                : cake.design === 'strawberry'
-                ? 'linear-gradient(180deg, #ff8b94 0%, #ff5e6c 100%)'
-                : cake.design === 'rainbow'
-                ? 'linear-gradient(90deg, #ff007f, #7f00ff, #00ffff)'
-                : cake.design === 'custom'
-                ? `linear-gradient(180deg, ${cake.customTier2Color || '#ff9999'} 0%, ${cake.customTier1Color || '#ff3333'} 100%)`
-                : 'linear-gradient(180deg, #faf9f6 0%, #d4af37 100%)'
+              background: previewBaseBackground
             }}
           >
             {/* Cake Message Text */}
