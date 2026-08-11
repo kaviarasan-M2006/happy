@@ -41,6 +41,13 @@ export interface BirthdayUniverse {
   };
   generatedVideoUrl: string; // Data URL of the generated slideshow MP4
   accessPassword?: string;
+  passwordProtected?: boolean;
+  animationPreset?: string;
+  textStyle?: {
+    fontFamily: string;
+    titleSize: number;
+    bodySize: number;
+  };
   contactPhone?: string;
   contactMessage?: string;
   createdAt: number;

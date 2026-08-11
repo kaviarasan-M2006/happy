@@ -19,11 +19,16 @@ export const themes: ThemeConfig[] = [
   { id: 'minimal-elegant', name: '🖤 Minimal Elegant', desc: 'Clean, simple high-contrast layout for a timeless feel.', previewGradient: 'linear-gradient(135deg, #ffffff 0%, #eaeaea 100%)', textColor: '#1a1a1a' },
   { id: 'anime', name: '🎒 Anime', desc: 'Pop cartoon style, comic borders, vibrant layout.', previewGradient: 'linear-gradient(135deg, #ff7e5f 0%, #feb47b 100%)', textColor: '#2c3e50' },
   { id: 'custom', name: '🎨 Custom Theme', desc: 'Define your own theme setup and look.', previewGradient: 'linear-gradient(135deg, #1f4068 0%, #162447 100%)', textColor: '#ffffff' }
+  , { id: 'celebration', name: 'Celebration', desc: 'Full-screen confetti, bright party colors, animated birthday energy.', previewGradient: 'linear-gradient(135deg, #5f0a87 0%, #ff007f 52%, #ffca3a 100%)', textColor: '#ffffff' },
+  { id: 'midnight-party', name: 'Midnight Party', desc: 'Deep blue neon, fireworks, and a cinematic night celebration.', previewGradient: 'linear-gradient(135deg, #020024 0%, #090979 50%, #00d4ff 100%)', textColor: '#e6f7ff' },
+  { id: 'sunset', name: 'Sunset Wishes', desc: 'Warm golden sky and a soft, emotional birthday atmosphere.', previewGradient: 'linear-gradient(135deg, #ff512f 0%, #f09819 55%, #ffe259 100%)', textColor: '#4a1d12' },
 ];
 
 interface ThemeSelectorProps {
   selectedTheme: string;
   setSelectedTheme: (themeId: string) => void;
+  animationPreset: string;
+  setAnimationPreset: (preset: string) => void;
   particles: {
     stars: boolean;
     butterflies: boolean;
@@ -53,9 +58,12 @@ interface ThemeSelectorProps {
 export const ThemeSelector: React.FC<ThemeSelectorProps> = ({
   selectedTheme,
   setSelectedTheme,
+  animationPreset,
+  setAnimationPreset,
   particles,
   setParticles
 }) => {
+  const animationPresets = ['Confetti Cannon', 'Balloon Lift', 'Firework Finale', 'Sparkle Shower', 'Golden Glitter', 'Neon Pulse', 'Starfall', 'Rose Petals', 'Ribbon Dance', 'Disco Lights', 'Galaxy Warp', 'Cloud Float', 'Heart Burst', 'Bubble Pop', 'Magic Portal', 'Laser Party', 'Aurora Glow', 'Snowfall', 'Butterfly Flight', 'Rainbow Trail', 'Champagne Pop', 'Spotlight Stage', 'Photo Flash', 'Gift Reveal', 'Candle Glow', 'Cake Spin', 'Streamer Rain', 'Party Popper', 'Retro Arcade', 'Ocean Waves', 'Sunset Glow', 'Moonlight Stars', 'Flower Bloom', 'Diamond Shine', 'Royal Entrance', 'Carnival Lights', 'Music Beats', 'Dance Floor', 'Comic Pop', 'Pixel Party', 'Paper Planes', 'Cloud Confetti', 'Candy Rain', 'Meteor Shower', 'Dreamy Bokeh', 'Crystal Sparkle', 'Celebration Storm', 'Festival Colors', 'Happy Birthday Burst', 'Grand Finale'];
   const toggleParticle = (key: keyof typeof particles) => {
     setParticles((prev) => ({
       ...prev,
@@ -96,6 +104,11 @@ export const ThemeSelector: React.FC<ThemeSelectorProps> = ({
           </div>
         ))}
       </div>
+
+      <h3 style={{ margin: '32px 0 12px' }}>Celebration Animation</h3>
+      <select className="form-input" value={animationPreset} onChange={(e) => setAnimationPreset(e.target.value)}>
+        {animationPresets.map((preset, index) => <option key={preset} value={`animation-${index + 1}`}>{String(index + 1).padStart(2, '0')} — {preset}</option>)}
+      </select>
 
       <h3 style={{ marginBottom: '20px' }}>Particles & Visual Effects</h3>
       <div className="particles-toggles">

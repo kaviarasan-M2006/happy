@@ -130,15 +130,38 @@
   --theme-border-radius: 16px;
 }
 
+.theme-celebration { --theme-bg: radial-gradient(circle at 50% 20%, #ffca3a 0 3%, transparent 18%), linear-gradient(135deg,#250044,#b00068 50%,#ff6b35); --theme-text:#fff; --theme-accent:#ffdf4d; --theme-accent-glow:rgba(255,223,77,.65); --theme-glass-bg:rgba(42,0,61,.55); --theme-glass-border:rgba(255,255,255,.3); --theme-font:'Outfit',sans-serif; --theme-border-radius:24px; }
+.theme-midnight-party { --theme-bg:radial-gradient(circle at 50% 0,#214de0 0,transparent 34%),linear-gradient(160deg,#02031c,#081a4e 58%,#160033); --theme-text:#eaf8ff; --theme-accent:#63e6ff; --theme-accent-glow:rgba(99,230,255,.65); --theme-glass-bg:rgba(1,12,48,.58); --theme-glass-border:rgba(99,230,255,.3); --theme-font:'Outfit',sans-serif; --theme-border-radius:18px; }
+.theme-sunset { --theme-bg:linear-gradient(160deg,#ffdf8a 0%,#ff9c45 38%,#e84949 72%,#4c1d65); --theme-text:#421c22; --theme-accent:#fff1ac; --theme-accent-glow:rgba(255,241,172,.7); --theme-glass-bg:rgba(255,240,211,.35); --theme-glass-border:rgba(255,255,255,.52); --theme-font:'Playfair Display',serif; --theme-border-radius:26px; }
+
 /* Base Theme Styling overrides */
 .universe-container {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100dvh;
   min-height: 100vh;
   background: var(--theme-bg);
   color: var(--theme-text);
   font-family: var(--theme-font);
   transition: background 0.8s ease, color 0.5s ease;
-  overflow-x: hidden;
+  overflow: hidden;
 }
+
+.universe-container[class*="animation-"]::before {
+  content: '';
+  position: absolute;
+  inset: -25%;
+  pointer-events: none;
+  z-index: 1;
+  background: radial-gradient(circle at 15% 30%, var(--theme-accent-glow) 0 2px, transparent 4px), radial-gradient(circle at 82% 18%, rgba(255,255,255,.8) 0 2px, transparent 4px), radial-gradient(circle at 42% 75%, var(--theme-accent-glow) 0 3px, transparent 5px);
+  background-size: 170px 170px, 230px 230px, 310px 310px;
+  animation: celebration-atmosphere 9s linear infinite;
+}
+.universe-container.animation-2::before, .universe-container.animation-7::before, .universe-container.animation-18::before, .universe-container.animation-31::before { animation-duration: 15s; }
+.universe-container.animation-3::before, .universe-container.animation-14::before, .universe-container.animation-27::before, .universe-container.animation-50::before { animation-duration: 4s; filter: saturate(1.6); }
+.universe-container.animation-6::before, .universe-container.animation-16::before, .universe-container.animation-35::before, .universe-container.animation-44::before { animation-direction: reverse; filter: hue-rotate(75deg); }
+@keyframes celebration-atmosphere { from { transform: translate3d(0,0,0) rotate(0); } to { transform: translate3d(7%, -11%, 0) rotate(18deg); } }
 
 /* Glassmorphism Panels */
 .glass-panel {

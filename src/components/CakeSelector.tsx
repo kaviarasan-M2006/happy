@@ -16,6 +16,13 @@ interface CakeSelectorProps {
 }
 
 export const CakeSelector: React.FC<CakeSelectorProps> = ({ cake, setCake, defaultAge }) => {
+  const cakePresetNames = [
+    'Velvet Rose', 'Midnight Chocolate', 'Rainbow Sprinkle', 'Golden Crown', 'Berry Bloom', 'Ocean Pearl', 'Lavender Dream', 'Emerald Garden', 'Sunset Citrus', 'Ruby Romance',
+    'Galaxy Glaze', 'Candy Cloud', 'Tropical Mango', 'Mint Marble', 'Coffee Caramel', 'Vanilla Confetti', 'Blueberry Moon', 'Peach Blossom', 'Pistachio Luxe', 'Cherry Jubilee',
+    'Black Forest', 'Strawberry Swirl', 'Lemon Zest', 'Coconut Snow', 'Red Velvet', 'Rose Gold', 'Purple Orchid', 'Aqua Mermaid', 'Safari Party', 'Space Rocket',
+    'Princess Castle', 'Football Party', 'Superhero Pop', 'Dinosaur Fun', 'Unicorn Magic', 'Butterfly Garden', 'Floral Elegance', 'Disco Neon', 'Casino Gold', 'Royal Marble',
+    'Ice Cream Party', 'Donut Delight', 'Cookie Stack', 'Fruit Fiesta', 'Candy Cane', 'Autumn Spice', 'Winter Snow', 'Spring Bloom', 'Summer Splash', 'Classic Celebration'
+  ];
   const updateCake = (key: keyof CakeConfig, value: any) => {
     setCake((prev) => ({
       ...prev,
@@ -57,7 +64,11 @@ export const CakeSelector: React.FC<CakeSelectorProps> = ({ cake, setCake, defau
               <option value="chocolate">🍫 Double Chocolate (Brown)</option>
               <option value="rainbow">🌈 Magical Rainbow (Gradient)</option>
               <option value="elegant">✨ Royal Gold & Cream (Elegant)</option>
+              <option value="classic-3d">Classic 3D Cake — 360° Rotation</option>
               <option value="custom">🎨 Custom Design (Choose Colors)</option>
+              <optgroup label="50 designer cake presets">
+                {cakePresetNames.map((name, index) => <option key={name} value={`cake-${index + 1}`}>{String(index + 1).padStart(2, '0')} — {name}</option>)}
+              </optgroup>
             </select>
           </div>
 

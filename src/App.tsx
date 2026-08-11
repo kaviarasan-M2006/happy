@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { translations } from './locales/translations';
-import { getUniverse, saveUniverse, getAllUniverses, deleteUniverse, type BirthdayUniverse } from './db/indexedDB';
+import { saveUniverse, getAllUniverses, deleteUniverse, type BirthdayUniverse } from './db/indexedDB';
 import { DragDropUpload } from './components/DragDropUpload';
 import { ThemeSelector } from './components/ThemeSelector';
 import { CakeSelector } from './components/CakeSelector';
@@ -120,15 +120,6 @@ const buildUniverseShareUrl = (id: string, location: Location = window.location)
 
 const getUniverseData = async (id: string, password?: string): Promise<BirthdayUniverse | { requiresPassword: true } | null> => {
   try {
-    const localUniverse = await getUniverse(id);
-    if (localUniverse) {
-      return localUniverse;
-    }
-  } catch (err) {
-    console.warn('Failed to read universe from browser storage', err);
-  }
-
-  try {
     const passwordQuery = password ? `?password=${encodeURIComponent(password)}` : '';
     const apiRes = await fetch(`/api/universe/${encodeURIComponent(id)}${passwordQuery}`);
     if (apiRes.status === 403) {
@@ -174,6 +165,7 @@ export default function App() {
   const [musicLoop, setMusicLoop] = useState(true);
   const [musicVolume, setMusicVolume] = useState(80);
   const [themeName, setThemeName] = useState('fantasy-universe');
+  const [animationPreset, setAnimationPreset] = useState('animation-1');
   const [particles, setParticles] = useState({
     stars: true,
     butterflies: false,
@@ -195,6 +187,7 @@ export default function App() {
   const [generatedVideoUrl, setGeneratedVideoUrl] = useState('');
   const [generatedLink, setGeneratedLink] = useState('');
   const [accessPassword, setAccessPassword] = useState('');
+  const [textStyle, setTextStyle] = useState({ fontFamily: 'serif', titleSize: 42, bodySize: 16 });
   const [contactPhone, setContactPhone] = useState('');
   const [contactMessage, setContactMessage] = useState('Happy Birthday!');
   const [enteredPassword, setEnteredPassword] = useState('');
@@ -281,7 +274,7 @@ export default function App() {
         if (data) {
           setUniverseData(data);
           setRouteRequiresPassword(false);
-          setRecipientLanguage(data.language || 'en');
+          setRecipientLanguage('en');
           // Setup candles array
           setCandlesLit(new Array(data.cake.candleCount || 1).fill(true));
 
@@ -490,10 +483,12 @@ export default function App() {
       musicVolume,
       voiceDataUrl: voiceUrl,
       theme: themeName,
+      animationPreset,
       particles,
       cake,
       generatedVideoUrl,
       accessPassword: accessPassword.trim() || undefined,
+      textStyle,
       contactPhone: contactPhone.trim() || undefined,
       contactMessage: contactMessage.trim() || undefined,
       createdAt: Date.now()
@@ -502,13 +497,18 @@ export default function App() {
     setLoading(true);
     await saveUniverse(newUniverse);
     try {
-      await fetch('/api/universe', {
+      const response = await fetch('/api/universe', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(newUniverse)
       });
+      const result = response.headers.get('content-type')?.includes('application/json') ? await response.json() : null;
+      if (!response.ok || !result?.success) throw new Error('The public sharing service did not save the universe.');
     } catch (err) {
       console.warn('API sync post failed', err);
+      setLoading(false);
+      alert('Your birthday link was not published. Please deploy with the included Render/Railway Node server and try again.');
+      return;
     }
     setLoading(false);
 
@@ -550,6 +550,7 @@ export default function App() {
     setMusicVolume(univ.musicVolume !== undefined ? univ.musicVolume : 80);
     setVoiceUrl(univ.voiceDataUrl || '');
     setThemeName(univ.theme || 'fantasy-universe');
+    setAnimationPreset(univ.animationPreset || 'animation-1');
     setParticles(univ.particles || {
       stars: true,
       butterflies: false,
@@ -569,6 +570,7 @@ export default function App() {
       message: 'Happy Birthday!'
     });
     setGeneratedVideoUrl(univ.generatedVideoUrl || '');
+    setTextStyle(univ.textStyle || { fontFamily: 'serif', titleSize: 42, bodySize: 16 });
     setGeneratedLink('');
     setAccessPassword(univ.accessPassword || '');
     setContactPhone(univ.contactPhone || '');
@@ -595,7 +597,7 @@ export default function App() {
   };
 
   // Fetch translation for recipient
-  const t = translations[recipientLanguage] || translations['en'];
+  const t = translations.en;
 
   if (loading) {
     return (
@@ -623,7 +625,7 @@ export default function App() {
 
   // PUBLIC BIRTHDAY EXPERIENCE VIEW
   if (currentRouteId) {
-    if (!universeData) {
+    if (!universeData && !routeRequiresPassword) {
       return (
         <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', background: '#08020f', color: '#ff5c5c', padding: '20px', textAlign: 'center' }}>
           <h2 style={{ marginBottom: '10px' }}>🌌 Universe Displaced</h2>
@@ -635,7 +637,30 @@ export default function App() {
       );
     }
 
+    // The API deliberately withholds protected data until a password is submitted.
+    if (!universeData && routeRequiresPassword && !passwordVerified) {
+      return (
+        <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#04030b', color: '#ffffff', padding: '20px' }}>
+          <div style={{ width: '100%', maxWidth: '420px', padding: '24px', borderRadius: '16px', border: '1px solid rgba(255,255,255,0.12)', background: 'rgba(255,255,255,0.04)' }}>
+            <h2 style={{ marginBottom: '8px' }}>Protected Birthday Experience</h2>
+            <p style={{ color: 'rgba(255,255,255,0.7)', marginBottom: '16px' }}>Enter the password shared with you to open this birthday surprise.</p>
+            <form onSubmit={handlePasswordSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+              <input type="password" value={enteredPassword} onChange={(e) => setEnteredPassword(e.target.value)} placeholder="Enter password" className="form-input" autoFocus />
+              {passwordError && <div style={{ color: '#ff6b6b', fontSize: '0.85rem' }}>{passwordError}</div>}
+              <button type="submit" className="btn btn-primary" style={{ justifyContent: 'center' }}>Open Birthday Universe</button>
+            </form>
+          </div>
+        </div>
+      );
+    }
+    if (!universeData) return null;
+
     const { name, nickname, age, message, thankYou, theme, cake: cakeData, generatedVideoUrl: slideVideo } = universeData;
+    const recipientTextStyle = universeData.textStyle || { fontFamily: 'serif', titleSize: 42, bodySize: 16 };
+    const presetNumber = Number(cakeData.design.match(/^cake-(\d+)$/)?.[1] || 0);
+    const presetHue = (presetNumber * 43) % 360;
+    const presetCakeStyle = presetNumber ? { background: `linear-gradient(90deg, hsl(${presetHue} 58% 28%), hsl(${presetHue} 82% 66%) 24%, hsl(${(presetHue + 18) % 360} 92% 88%) 50%, hsl(${presetHue} 75% 52%) 78%, hsl(${presetHue} 58% 25%))` } : {};
+    const presetTierStyle = presetNumber ? { background: `linear-gradient(90deg, hsl(${(presetHue + 12) % 360} 62% 35%), hsl(${(presetHue + 18) % 360} 88% 73%) 45%, hsl(${(presetHue + 30) % 360} 72% 44%))` } : {};
     const currentThemeClass = `theme-${theme || 'fantasy-universe'}`;
 
     if ((universeData?.accessPassword || routeRequiresPassword) && !passwordVerified) {
@@ -662,7 +687,7 @@ export default function App() {
     }
 
     return (
-      <div className={`universe-container ${currentThemeClass} custom-cursor-${theme || 'fantasy-universe'}`}>
+      <div className={`universe-container ${currentThemeClass} custom-cursor-${theme || 'fantasy-universe'} ${universeData.animationPreset || 'animation-1'}`} style={{ fontFamily: recipientTextStyle.fontFamily }}>
         {/* Particle Canvas engines */}
         {universeData.particles.confetti && <ConfettiCanvas active={experiencePage === 3 && isCakeBlown} />}
         {universeData.particles.fireworks && <FireworksCanvas active={(experiencePage === 3 && isCakeBlown) || experiencePage === 5} />}
@@ -712,10 +737,10 @@ export default function App() {
         {/* PAGE 1: MAGICAL ENTRANCE */}
         <div className={`page-container ${experiencePage === 1 ? 'active' : ''}`}>
           <div style={{ zIndex: 10, textAlign: 'center', padding: '20px' }}>
-            <h1 className="entrance-title glow-text font-serif">
+            <h1 className="entrance-title glow-text" style={{ fontSize: `${recipientTextStyle.titleSize}px` }}>
               {t.cakeSub}
             </h1>
-            <p className="entrance-subtitle">
+            <p className="entrance-subtitle" style={{ fontSize: `${recipientTextStyle.bodySize}px` }}>
               {t.entranceSub}
             </p>
             <div style={{ display: 'flex', justifyContent: 'center' }}>
@@ -728,7 +753,7 @@ export default function App() {
             </button>
 
             {/* Language Selection display on entrance */}
-            <div style={{ marginTop: '30px', display: 'flex', alignItems: 'center', gap: '8px', justifyContent: 'center', opacity: 0.7 }}>
+            <div aria-hidden="true" style={{ display: 'none' }}>
               <Globe size={14} />
               <select
                 value={recipientLanguage}
@@ -820,10 +845,10 @@ export default function App() {
             {t.cakeBlowInstructions}
           </p>
 
-          <div className="cake-wrapper">
+          <div className={`cake-wrapper ${cakeData.design === 'classic-3d' ? 'cake-wrapper-classic-3d' : ''}`}>
             {/* Candles Row */}
             <div className="candles-row" style={{ maxWidth: '140px', flexWrap: 'wrap-reverse' }}>
-              {candlesLit.map((isLit, idx) => (
+              {candlesLit.slice(0, 12).map((isLit, idx) => (
                 <div
                   key={idx}
                   className="candle-container"
@@ -831,8 +856,9 @@ export default function App() {
                   title="Blow out candle"
                 >
                   <div className="candle-wax" style={{ background: cakeData.candleColor || '#ff3385' }} />
+                  <div className="candle-wax-side" style={{ background: cakeData.candleColor || '#ff3385' }} />
                   <div className="candle-wick" />
-                  {isLit && <div className="candle-flame" />}
+                  {isLit && <><div className="candle-flame" /><div className="candle-glow" /></>}
                 </div>
               ))}
             </div>
@@ -840,8 +866,9 @@ export default function App() {
             {/* Cake tier 2 */}
             <div
               className={`cake-tier-2 ${cakeData.design === 'chocolate' ? 'cake-design-chocolate' : cakeData.design === 'rainbow' ? 'cake-design-rainbow' : cakeData.design === 'elegant' ? 'cake-design-elegant' : ''}`}
-              style={cakeData.design === 'custom' ? { background: cakeData.customTier2Color || '#ff9999' } : {}}
+              style={cakeData.design === 'custom' ? { background: cakeData.customTier2Color || '#ff9999' } : presetTierStyle}
             />
+            <div className="cake-frosting-drips" aria-hidden="true"><i /><i /><i /><i /><i /></div>
 
             {/* Cake tier 1 */}
             <div
@@ -849,7 +876,7 @@ export default function App() {
               onClick={blowOutAllCandles}
               style={{
                 cursor: 'pointer',
-                ...(cakeData.design === 'custom' ? { background: `linear-gradient(180deg, ${cakeData.customTier2Color || '#ff9999'} 0%, ${cakeData.customTier1Color || '#ff3333'} 100%)` } : {})
+                ...(cakeData.design === 'custom' ? { background: `linear-gradient(180deg, ${cakeData.customTier2Color || '#ff9999'} 0%, ${cakeData.customTier1Color || '#ff3333'} 100%)` } : presetCakeStyle)
               }}
             >
               <div
@@ -868,7 +895,7 @@ export default function App() {
                 {cakeData.message || 'Happy Birthday!'}
               </div>
             </div>
-            <div style={{ width: '230px', height: '10px', background: 'rgba(255,255,255,0.2)', borderRadius: '5px', marginTop: '2px' }} />
+            <div className="cake-plate" />
           </div>
 
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '15px' }}>
@@ -1098,6 +1125,21 @@ export default function App() {
                 </div>
               </div>
 
+              <div className="form-group" style={{ padding: '15px', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.08)', background: 'rgba(255,255,255,0.02)' }}>
+                <h4 style={{ margin: '0 0 12px' }}>Typography for the shared experience</h4>
+                <div className="grid grid-cols-2 gap-20">
+                  <div>
+                    <label>Font style</label>
+                    <select className="form-input" value={textStyle.fontFamily} onChange={(e) => setTextStyle({ ...textStyle, fontFamily: e.target.value })}>
+                      <option value="serif">Classic Serif</option>
+                      <option value="system-ui, sans-serif">Modern Sans</option>
+                      <option value="cursive">Handwritten</option>
+                      <option value="monospace">Retro Mono</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+
               <div className="grid grid-cols-2 gap-20">
                 <div className="form-group">
                   <label><Clock size={14} /> Age (Optional)</label>
@@ -1321,6 +1363,8 @@ export default function App() {
               <ThemeSelector
                 selectedTheme={themeName}
                 setSelectedTheme={setThemeName}
+                animationPreset={animationPreset}
+                setAnimationPreset={setAnimationPreset}
                 particles={particles}
                 setParticles={setParticles}
               />
@@ -1440,7 +1484,8 @@ export default function App() {
         </div>
 
         {/* Existing / Saved Universes Manager List */}
-        {existingUniverses.length > 0 && (
+        {/* Saved recipient details are intentionally never displayed on the dashboard. */}
+        {false && existingUniverses.length > 0 && (
           <div style={{ maxWidth: '1200px', margin: '40px auto 20px auto', padding: '20px' }}>
             <h3 style={{ marginBottom: '15px', borderBottom: '1px solid rgba(255, 255, 255, 0.1)', paddingBottom: '8px' }}>
               📂 Your Saved Birthday Universes ({existingUniverses.length})

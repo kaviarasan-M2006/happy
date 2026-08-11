@@ -15,7 +15,8 @@ This app can be deployed as a standard Node.js web app.
 ### Recommended hosting
 - Render
 - Railway
-- Vercel with a Node server is not ideal because this app uses Express, so Render or Railway is simpler.
+
+Use the Node server deployment above for public links. A static-only Vercel deployment cannot store a generated universe for another person's phone to retrieve, so it will lead to the “Universe Displaced” screen. After deployment, create a new link; links made before the public save succeeded cannot be recovered.
 
 ### Deployment steps
 1. Push the project to GitHub.
