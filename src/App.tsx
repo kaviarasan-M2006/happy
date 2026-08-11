@@ -31,6 +31,12 @@ import {
   Globe
 } from 'lucide-react';
 
+// Public API configuration.
+// On Vercel set VITE_API_BASE_URL to the deployed Render/Railway server URL.
+// When the frontend and API are served by the same Node server, the relative URL works.
+const API_BASE_URL = String(import.meta.env.VITE_API_BASE_URL || '').replace(/\/$/, '');
+const apiUrl = (path: string) => `${API_BASE_URL}${path}`;
+
 // Chiptune Birthday Song Synthesizer using Web Audio API
 class BirthdaySynth {
   private ctx: AudioContext | null = null;
@@ -121,7 +127,7 @@ const buildUniverseShareUrl = (id: string, location: Location = window.location)
 const getUniverseData = async (id: string, password?: string): Promise<BirthdayUniverse | { requiresPassword: true } | null> => {
   try {
     const passwordQuery = password ? `?password=${encodeURIComponent(password)}` : '';
-    const apiRes = await fetch(`/api/universe/${encodeURIComponent(id)}${passwordQuery}`);
+    const apiRes = await fetch(apiUrl(`/api/universe/${encodeURIComponent(id)}${passwordQuery}`));
     if (apiRes.status === 403) {
       return { requiresPassword: true };
     }
@@ -272,25 +278,36 @@ export default function App() {
           return;
         }
         if (data) {
-          setUniverseData(data);
+          // TypeScript cannot safely narrow this API union after the password branch,
+          // so keep the public birthday object in a dedicated variable.
+          const universe = data as BirthdayUniverse;
+
+          setUniverseData(universe);
           setRouteRequiresPassword(false);
-          setRecipientLanguage('en');
-          // Setup candles array
-          setCandlesLit(new Array(data.cake.candleCount || 1).fill(true));
+
+          // Use the language selected by the creator instead of forcing English.
+          setRecipientLanguage(
+            translations[universe.language] ? universe.language : 'en'
+          );
+
+          // Setup exactly the number of candles selected by the creator.
+          setCandlesLit(
+            new Array(Math.max(1, Math.min(100, universe.cake?.candleCount || 1))).fill(true)
+          );
 
           // Set up background music
-          if (data.musicDataUrl) {
-            const audio = new Audio(data.musicDataUrl);
-            audio.loop = data.musicLoop;
-            audio.volume = (data.musicVolume || 80) / 100;
+          if (universe.musicDataUrl) {
+            const audio = new Audio(universe.musicDataUrl);
+            audio.loop = universe.musicLoop;
+            audio.volume = (universe.musicVolume || 80) / 100;
             setActiveMusic(audio);
           } else {
             setActiveMusic(null);
           }
 
           // Set up voice note
-          if (data.voiceDataUrl) {
-            const audio = new Audio(data.voiceDataUrl);
+          if (universe.voiceDataUrl) {
+            const audio = new Audio(universe.voiceDataUrl);
             setVoiceAudio(audio);
           } else {
             setVoiceAudio(null);
@@ -497,7 +514,7 @@ export default function App() {
     setLoading(true);
     await saveUniverse(newUniverse);
     try {
-      const response = await fetch('/api/universe', {
+      const response = await fetch(apiUrl('/api/universe'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(newUniverse)
@@ -505,9 +522,17 @@ export default function App() {
       const result = response.headers.get('content-type')?.includes('application/json') ? await response.json() : null;
       if (!response.ok || !result?.success) throw new Error('The public sharing service did not save the universe.');
     } catch (err) {
-      console.warn('API sync post failed', err);
+      console.error('API sync post failed:', err);
       setLoading(false);
-      alert('Your birthday link was not published. Please deploy with the included Render/Railway Node server and try again.');
+
+      const configuredApi = API_BASE_URL
+        ? `\n\nAPI: ${API_BASE_URL}`
+        : '\n\nVITE_API_BASE_URL is not configured.';
+
+      alert(
+        `Your birthday details were saved locally, but the public link was NOT published.${configuredApi}\n\n` +
+        'Deploy server-minimal.js to Render/Railway and set VITE_API_BASE_URL in Vercel, then redeploy.'
+      );
       return;
     }
     setLoading(false);
@@ -596,8 +621,13 @@ export default function App() {
     synthPlayer.play();
   };
 
+  // Keep the browser's language metadata in sync with the selected language.
+  useEffect(() => {
+    document.documentElement.lang = recipientLanguage || 'en';
+  }, [recipientLanguage]);
+
   // Fetch translation for recipient
-  const t = translations.en;
+  const t = translations[recipientLanguage] || translations.en;
 
   if (loading) {
     return (
@@ -752,21 +782,25 @@ export default function App() {
               {t.enterBtn}
             </button>
 
-            {/* Language Selection display on entrance */}
-            <div aria-hidden="true" style={{ display: 'none' }}>
-              <Globe size={14} />
+            {/* Language selector on the first slide */}
+            <div className="entrance-language-selector">
+              <Globe size={17} aria-hidden="true" />
+              <label htmlFor="birthday-language" className="sr-only">
+                Select language
+              </label>
               <select
+                id="birthday-language"
                 value={recipientLanguage}
                 onChange={(e) => setRecipientLanguage(e.target.value)}
-                style={{ background: 'rgba(0,0,0,0.5)', border: '1px solid rgba(255,255,255,0.2)', color: 'white', padding: '4px 8px', borderRadius: '4px', outline: 'none' }}
+                aria-label="Select birthday language"
               >
                 <option value="en">English</option>
-                <option value="ta">Tamil (தமிழ்)</option>
-                <option value="hi">Hindi (हिंदी)</option>
-                <option value="te">Telugu (తెలుగు)</option>
-                <option value="ml">Malayalam (മലയാളം)</option>
-                <option value="kn">Kannada (ಕನ್ನಡ)</option>
-                <option value="bn">Bengali (বাংলা)</option>
+                <option value="ta">தமிழ் — Tamil</option>
+                <option value="hi">हिन्दी — Hindi</option>
+                <option value="te">తెలుగు — Telugu</option>
+                <option value="ml">മലയാളം — Malayalam</option>
+                <option value="kn">ಕನ್ನಡ — Kannada</option>
+                <option value="bn">বাংলা — Bengali</option>
               </select>
             </div>
           </div>
@@ -847,8 +881,8 @@ export default function App() {
 
           <div className={`cake-wrapper ${cakeData.design === 'classic-3d' ? 'cake-wrapper-classic-3d' : ''}`}>
             {/* Candles Row */}
-            <div className="candles-row" style={{ maxWidth: '140px', flexWrap: 'wrap-reverse' }}>
-              {candlesLit.slice(0, 12).map((isLit, idx) => (
+            <div className="candles-row">
+              {candlesLit.map((isLit, idx) => (
                 <div
                   key={idx}
                   className="candle-container"
