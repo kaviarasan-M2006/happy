@@ -67,3 +67,79 @@ Opening the generated URL hash (e.g. `#/universe/XYZ123`) loads the magical cine
 - **Cake Celebration (Page 3)**: Interactive digital cake. Tapping or blowing into your microphone (utilizing Web Audio API analyzer) extinguishes candles, triggers canvas-based confetti and fireworks particle bursts, and plays a retro synthesized birthday chiptune melody.
 - **Birthday Video (Page 4)**: Plays the customized generated slideshow video with standard fullscreen playback controls.
 - **Final wishes & Reply (Page 5)**: Emotional cards showing the sender's final message, feedback star rating, and direct quick-reply actions (WhatsApp text reply, direct phone call). Displays the recipient's name written in glittering constellations against the dark sky!
+
+
+## Public birthday links: Vercel + Render/Railway
+
+This project has two parts:
+
+- **Vercel** hosts the React/Vite frontend.
+- **Render/Railway** runs `server-minimal.js` and stores `/api/universe` birthday data.
+
+### 1. Deploy the backend
+
+Use the included `render.yaml`, or create a Node web service with:
+
+```text
+Build command: npm install && npm run build
+Start command: npm start
+```
+
+After deployment, test:
+
+```text
+https://YOUR-BACKEND-URL/api/health
+```
+
+It must return JSON containing:
+
+```json
+{"ok":true}
+```
+
+### 2. Connect Vercel to the backend
+
+In the Vercel project settings, add this environment variable:
+
+```text
+VITE_API_BASE_URL=https://YOUR-BACKEND-URL
+```
+
+Do not add a trailing `/`.
+
+Then **redeploy Vercel**. The frontend now sends:
+
+```text
+POST /api/universe
+GET  /api/universe/:id
+```
+
+to the Render/Railway server instead of trying to call Vercel's frontend as the API.
+
+For local development, copy `.env.example` to `.env.local` and set your backend URL.
+
+### 3. Share links
+
+A generated link looks like:
+
+```text
+https://YOUR-VERCEL-DOMAIN/universe/ABC123...
+```
+
+Anyone opening that link loads the Vercel frontend, which requests the birthday data from the backend.
+
+**Important:** the included Node server uses the `data/` directory for storage. Render's default filesystem is ephemeral. For long-term persistence, configure a persistent disk/database on your backend provider and set `DATA_DIR` to its mounted directory.
+
+### Updated birthday features
+
+- Public link API URL is configurable with `VITE_API_BASE_URL`.
+- Recipient language is loaded from the saved universe instead of being forced to English.
+- Language selector is visible on the first birthday slide.
+- Tamil, Hindi, Telugu, Malayalam, Kannada and Bengali UI translations are available.
+- Unicode-friendly Noto fonts are loaded for Indian scripts.
+- Candle rendering uses the complete selected candle count and centers the candle group on the cake.
+- Animation choices are visual live-preview cards instead of a blind dropdown.
+- All 50 cake presets show a live visual preview and the selected preset name.
+- Cake preview renders the actual selected candle count.
+- Backend exposes `/api/health` for deployment testing.
+

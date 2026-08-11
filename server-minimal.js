@@ -14,7 +14,11 @@ app.use(cors());
 app.use(express.json({ limit: '100mb' }));
 app.use(express.urlencoded({ limit: '100mb', extended: true }));
 
-const DATA_DIR = path.join(__dirname, 'data');
+app.get('/api/health', (_req, res) => {
+  res.json({ ok: true, service: 'birthday-universe-api' });
+});
+
+const DATA_DIR = process.env.DATA_DIR ? path.resolve(process.env.DATA_DIR) : path.join(__dirname, 'data');
 if (!fs.existsSync(DATA_DIR)) {
   fs.mkdirSync(DATA_DIR, { recursive: true });
 }

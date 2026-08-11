@@ -6,3 +6,4 @@ services:
     buildCommand: npm install && npm run build
     startCommand: npm start
     autoDeploy: true
+    healthCheckPath: /api/health
