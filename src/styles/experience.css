@@ -229,13 +229,22 @@
 /* Candles */
 .candles-row {
   position: absolute;
+  /*
+   * The row is centered against the cake itself, not against the page.
+   * This keeps 1, 2, 10, 50 or 100 candles centered.
+   */
+  left: 50%;
   top: -91px;
-  left: 0;
-  width: 100%;
-  display: grid;
-  grid-template-columns: repeat(6, 12px);
+  transform: translateX(-50%);
+  width: min(90vw, 270px);
+  display: flex;
+  flex-wrap: wrap;
   justify-content: center;
-  gap: 7px 8px;
+  align-content: flex-end;
+  align-items: flex-end;
+  gap: 7px 6px;
+  margin: 0;
+  padding: 0;
   pointer-events: none;
   z-index: 30;
 }
@@ -295,7 +304,11 @@
 @media (max-width: 520px) {
   .page-container { padding: 16px 12px; }
   .cake-wrapper { margin-top: 26px; min-height: 170px; }
-  .candles-row { top: -82px; max-width: 118px !important; gap: 5px; }
+  .candles-row {
+    top: -82px;
+    width: min(92vw, 270px);
+    gap: 5px 4px;
+  }
   .candle-container { transform: scale(.84); transform-origin: bottom; margin: -1px; }
   .cake-frosting-drips { top: 9px; }
 }

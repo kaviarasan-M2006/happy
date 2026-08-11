@@ -83,3 +83,208 @@ input, textarea, select {
     grid-template-columns: 1fr;
   }
 }
+
+
+/* ===== Birthday language selector ===== */
+.entrance-language-selector {
+  width: fit-content;
+  max-width: 100%;
+  margin: 18px auto 0;
+  padding: 9px 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border: 1px solid rgba(255,255,255,.18);
+  border-radius: 999px;
+  background: rgba(0,0,0,.38);
+  box-shadow: 0 8px 30px rgba(0,0,0,.18);
+  backdrop-filter: blur(12px);
+}
+
+.entrance-language-selector select {
+  min-width: 170px;
+  border: 0;
+  outline: 0;
+  color: #fff;
+  background: transparent;
+  font-family: "Noto Sans", "Noto Sans Tamil", "Noto Sans Devanagari", "Noto Sans Telugu",
+    "Noto Sans Malayalam", "Noto Sans Kannada", "Noto Sans Bengali", system-ui, sans-serif;
+  font-size: .92rem;
+  cursor: pointer;
+}
+
+.entrance-language-selector option {
+  background: #160b21;
+  color: #fff;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0,0,0,0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ===== Animation live preview cards ===== */
+.selector-help {
+  margin: -4px 0 14px;
+  color: rgba(255,255,255,.62);
+  font-size: .86rem;
+}
+
+.animation-preview-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(175px, 1fr));
+  gap: 14px;
+  margin-bottom: 34px;
+}
+
+.animation-preview-card {
+  min-width: 0;
+  padding: 0;
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,.1);
+  border-radius: 16px;
+  color: #fff;
+  background: rgba(255,255,255,.035);
+  text-align: left;
+  cursor: pointer;
+  transition: transform .22s ease, border-color .22s ease, box-shadow .22s ease;
+}
+
+.animation-preview-card:hover {
+  transform: translateY(-4px);
+  border-color: rgba(255,0,127,.55);
+}
+
+.animation-preview-card.selected {
+  border-color: #ff007f;
+  box-shadow: 0 0 0 2px rgba(255,0,127,.14), 0 12px 35px rgba(255,0,127,.18);
+}
+
+.animation-demo {
+  height: 112px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  isolation: isolate;
+  background:
+    radial-gradient(circle at 50% 50%, rgba(255,0,127,.28), transparent 55%),
+    linear-gradient(135deg, #10071b, #27103c);
+}
+
+.animation-demo::before,
+.animation-demo::after {
+  content: "";
+  position: absolute;
+  inset: 18%;
+  border: 1px solid rgba(255,255,255,.15);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.animation-demo::after {
+  inset: 30%;
+  border-color: rgba(255,0,127,.24);
+}
+
+.demo-shape {
+  position: absolute;
+  display: block;
+  font-weight: 900;
+  line-height: 1;
+  text-shadow: 0 0 14px currentColor;
+  will-change: transform, opacity;
+}
+
+.demo-star { color: #ffd76a; font-size: 28px; }
+.demo-balloon { color: #ff5d91; font-size: 26px; }
+.demo-sparkle { color: #fff; font-size: 20px; }
+.demo-dot { color: #6ee7ff; font-size: 30px; }
+
+.animation-preview-name {
+  padding: 11px 12px 3px;
+  font-size: .86rem;
+  font-weight: 700;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.animation-preview-status {
+  padding: 3px 12px 11px;
+  color: rgba(255,255,255,.55);
+  font-size: .73rem;
+}
+
+.animation-demo-1 .demo-star { animation: preview-spin 1.8s linear infinite; }
+.animation-demo-1 .demo-balloon { animation: preview-rise 1.8s ease-in-out infinite; }
+.animation-demo-2 .demo-star { animation: preview-rise 2s ease-in-out infinite; }
+.animation-demo-2 .demo-balloon { animation: preview-sway 1.2s ease-in-out infinite; }
+.animation-demo-3 .demo-star { animation: preview-burst 1.2s ease-in-out infinite; }
+.animation-demo-3 .demo-dot { animation: preview-burst 1.2s .25s ease-in-out infinite; }
+.animation-demo-4 .demo-star { animation: preview-pulse .75s ease-in-out infinite; }
+.animation-demo-4 .demo-sparkle { animation: preview-pulse .75s .2s ease-in-out infinite; }
+.animation-demo-5 .demo-star { animation: preview-spin 3s linear infinite; }
+.animation-demo-5 .demo-sparkle { animation: preview-twinkle .8s ease-in-out infinite; }
+.animation-demo-6 .demo-balloon { animation: preview-pulse .65s ease-in-out infinite; }
+.animation-demo-6 .demo-dot { animation: preview-pulse .65s .2s ease-in-out infinite; }
+.animation-demo-7 .demo-star { animation: preview-fall 1.6s linear infinite; }
+.animation-demo-7 .demo-sparkle { animation: preview-fall 1.9s .3s linear infinite; }
+.animation-demo-8 .demo-star { animation: preview-sway 1.6s ease-in-out infinite; }
+.animation-demo-8 .demo-balloon { animation: preview-sway 1.9s .2s ease-in-out infinite reverse; }
+.animation-demo-9 .demo-star { animation: preview-orbit 2s linear infinite; }
+.animation-demo-9 .demo-dot { animation: preview-orbit 2s .5s linear infinite reverse; }
+.animation-demo-10 .demo-star { animation: preview-burst 1.5s ease-in-out infinite; }
+.animation-demo-10 .demo-balloon { animation: preview-rise 1.5s .25s ease-in-out infinite; }
+
+@keyframes preview-spin {
+  to { transform: rotate(360deg) scale(1.12); }
+}
+@keyframes preview-rise {
+  0%,100% { transform: translateY(20px) scale(.8); opacity: .35; }
+  50% { transform: translateY(-20px) scale(1.15); opacity: 1; }
+}
+@keyframes preview-sway {
+  0%,100% { transform: translateX(-24px) rotate(-12deg); }
+  50% { transform: translateX(24px) rotate(12deg); }
+}
+@keyframes preview-burst {
+  0%,100% { transform: scale(.45); opacity: .3; }
+  50% { transform: scale(1.5); opacity: 1; }
+}
+@keyframes preview-pulse {
+  0%,100% { transform: scale(.65); opacity: .35; }
+  50% { transform: scale(1.35); opacity: 1; }
+}
+@keyframes preview-twinkle {
+  0%,100% { transform: rotate(-15deg) scale(.5); opacity: .25; }
+  50% { transform: rotate(15deg) scale(1.45); opacity: 1; }
+}
+@keyframes preview-fall {
+  0% { transform: translateY(-70px) rotate(0); opacity: 0; }
+  20%,80% { opacity: 1; }
+  100% { transform: translateY(70px) rotate(180deg); opacity: 0; }
+}
+@keyframes preview-orbit {
+  from { transform: rotate(0deg) translateX(34px) rotate(0deg); }
+  to { transform: rotate(360deg) translateX(34px) rotate(-360deg); }
+}
+
+@media (max-width: 600px) {
+  .animation-preview-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+  }
+  .animation-demo { height: 92px; }
+  .animation-preview-name { font-size: .78rem; }
+  .entrance-language-selector select { min-width: 145px; }
+}
