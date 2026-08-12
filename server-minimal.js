@@ -28,6 +28,9 @@ const getUniverseCollection = async () => {
 
   if (!universeCollectionPromise) {
     mongoClient = new MongoClient(MONGODB_URI, {
+      // Atlas requires TLS. Keep certificate verification enabled.
+      tls: true,
+      tlsMinVersion: 'TLSv1.2',
       serverSelectionTimeoutMS: 10000,
       connectTimeoutMS: 10000,
       maxPoolSize: 10,
